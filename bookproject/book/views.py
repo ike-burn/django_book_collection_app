@@ -9,3 +9,5 @@ class ListBookView(ListView):
 class DetailBookView(DetailView):
     template_name = 'book/book_detail.html'
     model = Book
+
+# ブランチ切り替え
