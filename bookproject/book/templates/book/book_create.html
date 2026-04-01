@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}書籍作成{% endblock %}
+
+{% block content %}
+	<!-- 「POST」はデータを送る時に使われる。CSRF対策も忘れずに -->
+	<form method="POST">{%  csrf_token %}
+		<!-- 「{{form.as_p}}」は、viewの中で指定したmodelで定義された項目を、pタグで囲って表示させる -->
+		{{form.as_p}}
+		<!-- 「type="submit"」はデータを送るボタン、「value」がボタン名 -->
+		<input type="submit" value="作成する">
+	</form>
+{% endblock content %}
