@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, DeleteView
 from .models import Book
 
 class ListBookView(ListView):
@@ -19,6 +19,11 @@ class CreateBookView(CreateView):
     #formの項目の作成が完了した後に遷移させるURLを指定するには、viewの中で「succes_url」という変数を定義する必要がある。
 	#「reverse関数」と使うとエラーになるが、「reverse_lazy」関数であれば「クラス変数」として定義することが出来るので、エラーにならない。
     # 「'list-book'」は、urls.pyの「name='list-book'」と紐付く。
+    success_url = reverse_lazy('list-book')
+
+class DeleteBookView(DeleteView):
+    template_name = 'book/book_confirm_delete.html'
+    model = Book
     success_url = reverse_lazy('list-book')
 
 # ブランチ切り替え
