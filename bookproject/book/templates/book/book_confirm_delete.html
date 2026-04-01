@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}書籍削除{% endblock %}
+
+{% block content %}
+	<!-- 「POST」はデータを送る時に使われる。CSRF対策も忘れずに -->
+	<form method="POST">
+		{%  csrf_token %}
+		<button type="submit">{{ object.title }}を削除する</button>
+	</form>
+{% endblock content %}
