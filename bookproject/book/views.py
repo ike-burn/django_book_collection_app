@@ -33,7 +33,7 @@ class DeleteBookView(DeleteView):
     success_url = reverse_lazy('list-book')
 
 class UpdateBookView(UpdateView):
-    template_name = 'book/book_confirm_delete.html'
+    template_name = 'book/book_update.html'
     model = Book
     fields = ('title', 'text', 'category')
     success_url = reverse_lazy('list-book')

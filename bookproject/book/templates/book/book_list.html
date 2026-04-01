@@ -9,6 +9,9 @@
 		<h5 class="card-header">{{ item.title }}</h5>
 		<div class="card-body">
 			<p class="card-text">{{ item.text }}</p>
+			<!-- 画面を遷移させるためのリンクを設定 -->
+			 <!-- 「urls.py」ファイルの中で「name = "detail-book"」と定義したコードに対応したURLが呼び出される -->
+			<a href="{% url 'detail-book' item.pk %}" class="btn-primary"></a>
 			<a href="#" class="btn btn-primary">Go somewhere</a>
 			<h6 class="card-title">{{ item.category }}</h6>
 		</div>
