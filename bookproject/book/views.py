@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import logout
 from django.urls import reverse_lazy
 from django.views.generic import (
 	ListView,
@@ -47,3 +48,7 @@ def index_view(request):
     # ３つ目の引数には「context」を指定する。辞書型データ（左がkey、右がvalue）である。keyを呼び出すことでvalueを呼び出す。
     # 「 {'object_list': object_list}」はBookモデルの全データを「object_list」（右）で呼び出せるようにしている。
     return render(request, 'book/index.html', {'object_list': object_list})
+
+def logout_view(request):
+    logout(request)
+    return redirect('index')
