@@ -37,3 +37,13 @@ class UpdateBookView(UpdateView):
     model = Book
     fields = ('title', 'text', 'category')
     success_url = reverse_lazy('list-book')
+
+def index_view(request):
+    # BookはBookモデルを示す。
+    # 「order_by('category')」により、カテゴリごとに並び替えて表示することが出来る。
+    object_list = Book.objects.order_by('category')
+    # 「render」関数を使う時、１つ目の引数は「request」を記述する。
+    # ２つ目の引数にhtmlファイルを「template」として使うことが出来る。
+    # ３つ目の引数には「context」を指定する。辞書型データ（左がkey、右がvalue）である。keyを呼び出すことでvalueを呼び出す。
+    # 「 {'object_list': object_list}」はBookモデルの全データを「object_list」（右）で呼び出せるようにしている。
+    return render(request, 'book/index.html', {'object_list': object_list})
