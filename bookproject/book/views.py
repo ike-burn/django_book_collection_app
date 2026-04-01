@@ -37,4 +37,3 @@ class UpdateBookView(UpdateView):
     model = Book
     fields = ('title', 'text', 'category')
     success_url = reverse_lazy('list-book')
-# ブランチ切り替え

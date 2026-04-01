@@ -15,5 +15,3 @@ class Book(models.Model):
         # 「__str__」は特殊メソッド（オブジェクトの文字列表現を返す）
         def __str__(self):
             return self.title
-
-# ブランチ切り替え

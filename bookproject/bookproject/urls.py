@@ -5,5 +5,3 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('book.urls')),
 ]
-
-# ブランチ切り替え
