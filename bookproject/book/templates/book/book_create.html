@@ -3,8 +3,8 @@
 {% block title %}書籍作成{% endblock %}
 
 {% block content %}
-	<!-- 「POST」はデータを送る時に使われる。CSRF対策も忘れずに -->
-	<form method="POST">
+	<!-- 「post」はデータを送る時に使われる。CSRF対策も忘れずに -->
+	<form method="post" enctype="multipart/form-data" class="p-4 m-4 bg-light border border-success rounded form-group">
 		{%  csrf_token %}
 		<!-- 「{{form.as_p}}」は、viewの中で指定したmodelで定義された項目を、pタグで囲って表示させる -->
 		{{form.as_p}}
