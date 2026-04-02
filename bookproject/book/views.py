@@ -1,12 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
-from django.urls import reverse,reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic import (
-	ListView,
-	DetailView,
-	CreateView,
-	DeleteView,
-	UpdateView,
+    ListView,
+    DetailView,
+    CreateView,
+    DeleteView,
+    UpdateView,
 )
 from .models import Book, Review
 
@@ -24,20 +25,43 @@ class CreateBookView(LoginRequiredMixin, CreateView):
     model = Book
     fields = ('title', 'text', 'category', 'thumbnail')
     #formの項目の作成が完了した後に遷移させるURLを指定するには、viewの中で「success_url」という変数を定義する必要がある。
-	#「reverse関数」と使うとエラーになるが、「reverse_lazy」関数であれば「クラス変数」として定義することが出来るので、エラーにならない。
+    #「reverse関数」と使うとエラーになるが、「reverse_lazy」関数であれば「クラス変数」として定義することが出来るので、エラーにならない。
     # 「'list-book'」は、urls.pyの「name='list-book'」と紐付く。
     success_url = reverse_lazy('list-book')
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+
+        return super().form_valid(form)
 
 class DeleteBookView(LoginRequiredMixin, DeleteView):
     template_name = 'book/book_confirm_delete.html'
     model = Book
     success_url = reverse_lazy('list-book')
 
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+
+        if obj.user != self.request.user:
+            raise PermissionDenied
+
+        return obj
+
 class UpdateBookView(LoginRequiredMixin, UpdateView):
     template_name = 'book/book_update.html'
     model = Book
     fields = ('title', 'text', 'category', 'thumbnail')
-    success_url = reverse_lazy('list-book')
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+
+        if obj.user != self.request.user:
+            raise PermissionDenied
+
+        return obj
+
+    def get_success_url(self):
+        return reverse('detail-book', kwargs={'pk': self.object.id})
 
 def index_view(request):
     # BookはBookモデルを示す。
@@ -66,7 +90,7 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
         context['book'] = Book.objects.get(pk=self.kwargs['book_id'])
         return context
 
-	# 「form_valid」はフォームが送信され、その入力内容に間違いが無い場合に、データが保存される前に呼び出されるメソッド。
+    # 「form_valid」はフォームが送信され、その入力内容に間違いが無い場合に、データが保存される前に呼び出されるメソッド。
     def form_valid(self, form):
         # 以下の記述は、「form（Formクラス）」の「instance（フォームが作成された時に作られるデータ」に「user」という属性でデータを追加することを意味する。
         # 「self.request.user」は、ユーザーがログインしている場合の「request」オブジェクトに入っている「user」の情報（ログインしているユーザーの情報）を意味する。
@@ -74,7 +98,7 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
 
         return super().form_valid(form)
 
-	# クラス変数にコードを書く時は「reverse_lazy」を使用していたが、今回は「get_success_url」のメソッドの中にコードを書くため、「reverse」を使う。
+    # クラス変数にコードを書く時は「reverse_lazy」を使用していたが、今回は「get_success_url」のメソッドの中にコードを書くため、「reverse」を使う。
     def get_success_url(self):
         # 「kwargs={'pk': self.object.book.id}」の形でキーワード引数に書籍のidの番号を渡す。
         return reverse('detail-book', kwargs={'pk': self.object.book.id})
