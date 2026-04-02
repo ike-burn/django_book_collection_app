@@ -10,6 +10,7 @@ from django.views.generic import (
     UpdateView,
 )
 from .models import Book, Review
+from django.db.models import Avg
 
 class ListBookView(LoginRequiredMixin, ListView):
     template_name = 'book/book_list.html'
@@ -65,13 +66,14 @@ class UpdateBookView(LoginRequiredMixin, UpdateView):
 
 def index_view(request):
     # BookはBookモデルを示す。
-    # 「order_by('category')」により、カテゴリごとに並び替えて表示することが出来る。
-    object_list = Book.objects.order_by('category')
+    # 「-（マイナス）」を付けると降順（数が多い順）に並べ替えが出来る。
+    object_list = Book.objects.order_by('-id')
+    ranking_list = Book.objects.annotate(avg_rating=Avg('review__rate')).order_by('-avg_rating')
     # 「render」関数を使う時、１つ目の引数は「request」を記述する。
     # ２つ目の引数にhtmlファイルを「template」として使うことが出来る。
     # ３つ目の引数には「context」を指定する。辞書型データ（左がkey、右がvalue）である。keyを呼び出すことでvalueを呼び出す。
     # 「 {'object_list': object_list}」はBookモデルの全データを「object_list」（右）で呼び出せるようにしている。
-    return render(request, 'book/index.html', {'object_list': object_list})
+    return render(request, 'book/index.html', {'object_list': object_list, 'ranking_list': ranking_list})
 
 class CreateReviewView(LoginRequiredMixin, CreateView):
     model = Review
