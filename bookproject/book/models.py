@@ -4,7 +4,7 @@ from .consts import MAX_RATE
 RATE_CHOICES = [(x, str(x)) for x in range(0, MAX_RATE + 1)]
 
 # 「タプル（順番付きで値を並べる）」、choiesに渡すための候補一覧
-CATEGORY = (('business', 'ビジネス'), ('life', '生活'), ('other', 'その他'))
+CATEGORY = (('backend', 'バックエンド'), ('frontend', 'フロントエンド'), ('infrastructure', 'インフラ'), ('technical-books', '技術書'), ('qualification', '資格'), ('other', 'その他'))
 
 class Book(models.Model):
     # 「フィールド」とは、モデルの中に書く「データの項目」。タイトル、説明や本文、分類
