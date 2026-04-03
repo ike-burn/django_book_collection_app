@@ -1,5 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
+from django.db.models import Avg
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
@@ -9,12 +11,33 @@ from django.views.generic import (
     DeleteView,
     UpdateView,
 )
+
+from .consts import ITEM_PER_PAGE
+
 from .models import Book, Review
-from django.db.models import Avg
+
+# Create your views here.
+
+def index_view(request):
+    # BookはBookモデルを示す。
+    # 「-（マイナス）」を付けると降順（数が多い順）に並べ替えが出来る。
+    object_list = Book.objects.order_by('-id')
+    ranking_list = Book.objects.annotate(avg_rating=Avg('review__rate')).order_by('-avg_rating')
+    # 「render」関数を使う時、１つ目の引数は「request」を記述する。
+    # ２つ目の引数にhtmlファイルを「template」として使うことが出来る。
+    # ３つ目の引数には「context」を指定する。辞書型データ（左がkey、右がvalue）である。keyを呼び出すことでvalueを呼び出す。
+    # 「 {'object_list': object_list}」はBookモデルの全データを「object_list」（右）で呼び出せるようにしている。
+
+    paginator = Paginator(ranking_list, ITEM_PER_PAGE)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.page(page_number)
+
+    return render(request, 'book/index.html', {'object_list': object_list, 'ranking_list': ranking_list, 'page_obj': page_obj},)
 
 class ListBookView(LoginRequiredMixin, ListView):
     template_name = 'book/book_list.html'
     model = Book
+    paginate_by = ITEM_PER_PAGE
 
 class DetailBookView(LoginRequiredMixin, DetailView):
     template_name = 'book/book_detail.html'
@@ -64,21 +87,11 @@ class UpdateBookView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse('detail-book', kwargs={'pk': self.object.id})
 
-def index_view(request):
-    # BookはBookモデルを示す。
-    # 「-（マイナス）」を付けると降順（数が多い順）に並べ替えが出来る。
-    object_list = Book.objects.order_by('-id')
-    ranking_list = Book.objects.annotate(avg_rating=Avg('review__rate')).order_by('-avg_rating')
-    # 「render」関数を使う時、１つ目の引数は「request」を記述する。
-    # ２つ目の引数にhtmlファイルを「template」として使うことが出来る。
-    # ３つ目の引数には「context」を指定する。辞書型データ（左がkey、右がvalue）である。keyを呼び出すことでvalueを呼び出す。
-    # 「 {'object_list': object_list}」はBookモデルの全データを「object_list」（右）で呼び出せるようにしている。
-    return render(request, 'book/index.html', {'object_list': object_list, 'ranking_list': ranking_list})
 
 class CreateReviewView(LoginRequiredMixin, CreateView):
+    template_name = 'book/review_form.html'
     model = Review
     fields = ('book', 'title', 'text', 'rate')
-    template_name = 'book/review_form.html'
 
     # 「context」は辞書型のデータ。
     # 「**kwargs」はキーワード引数。「urls.py」の「path('book/<int:book_id>/review/', views.CreateReviewView.as_view(), name='review'),」の<int:book_id>が「view」に渡される。
