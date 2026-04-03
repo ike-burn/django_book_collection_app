@@ -4,7 +4,15 @@ from .consts import MAX_RATE
 RATE_CHOICES = [(x, str(x)) for x in range(0, MAX_RATE + 1)]
 
 # 「タプル（順番付きで値を並べる）」、choiesに渡すための候補一覧
-CATEGORY = (('backend', 'バックエンド'), ('frontend', 'フロントエンド'), ('infrastructure', 'インフラ'), ('technical-books', '技術書'), ('qualification', '資格'), ('other', 'その他'))
+CATEGORY = (('バックエンド', 'バックエンド'), ('フロントエンド', 'フロントエンド'), ('インフラ', 'インフラ'), ('技術書', '技術書'), ('資格', '資格'), ('その他', 'その他'))
+LEGACY_CATEGORY_LABELS = {
+    'backend': 'バックエンド',
+    'frontend': 'フロントエンド',
+    'infrastructure': 'インフラ',
+    'technical-books': '技術書',
+    'qualification': '資格',
+    'other': 'その他',
+}
 
 class Book(models.Model):
     # 「フィールド」とは、モデルの中に書く「データの項目」。タイトル、説明や本文、分類
@@ -21,6 +29,10 @@ class Book(models.Model):
     # 「__str__」は特殊メソッド（オブジェクトの文字列表現を返す）
     def __str__(self):
         return self.title
+
+    @property
+    def category_label(self):
+        return LEGACY_CATEGORY_LABELS.get(self.category, self.category)
 
 class Review(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
